@@ -13,6 +13,8 @@ typedef struct Vector
 
 void VectorCreate(Vector *this, size_t size, size_t valueSize);
 
+void VectorResize(Vector *this, size_t newSize);
+
 void VectorSetValue(Vector *this, size_t index, void *value);
 
 void *VectorGetValue(Vector *this, size_t index);

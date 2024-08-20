@@ -18,6 +18,19 @@ void VectorCreate(Vector *this, size_t size, size_t valueSize)
     this->len = 0;
 }
 
+// 重新设置Vector大小并分配内存
+void VectorResize(Vector *this, size_t newSize)
+{
+    void *newData = realloc(this->data, newSize * this->valueSize);
+    if (newData == NULL)
+    {
+        fprintf(stderr, "Memory reallocation failed.\n");
+        exit(EXIT_FAILURE);
+    }
+    this->data = newData;
+    this->size = newSize;
+}
+
 // 设置 Vector 中指定索引处的值
 void VectorSetValue(Vector *this, size_t index, void *value)
 {
