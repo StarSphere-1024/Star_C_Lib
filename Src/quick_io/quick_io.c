@@ -1,8 +1,9 @@
+#include "quick_io.h"
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 #include <ctype.h>
-#include "quick_io.h"
 
 const double dten[10] = {0, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6, 1e-7, 1e-8, 1e-9};
 /// 一般题目至多要求输出小数点后6位，此数组足矣。

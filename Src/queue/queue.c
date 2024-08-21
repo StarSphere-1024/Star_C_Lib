@@ -4,32 +4,8 @@
 #include "string.h"
 
 #ifdef QUEUE_TYPE_LIST
-// 创建一个新的队列节点
-Node * newNode(void * data);
-// 创建一个新的队列
-Queue *createQueue();
-// 将一个元素添加到队列的尾部
-void append(Queue *q, void *data, size_t data_size);
-// 从队列的头部移除并返回一个元素
-void *pop(Queue *q);
-// 检查队列是否为空
-bool empty(Queue *q);
-// 获取队列长度
-size_t size(Queue *q);
-// 返回队列的头部元素，但不移除它
-void *peek(Queue *q);
 
-Queue_Fuc_t Queue_Fuc = {
-    .newNode = newNode,
-    .createQueue = createQueue,
-    .append = append,
-    .pop = pop,
-    .empty = empty,
-    .peek = peek
-};
-
-
-Node *newNode(void *data)
+Node *QueueNewNode(void *data)
 {
     Node *node = (Node *)malloc(sizeof(Node));
     if (!node)
@@ -42,17 +18,20 @@ Node *newNode(void *data)
     return node;
 }
 
-
-Queue *createQueue()
+bool QueueCreate(Queue *this)
 {
-    Queue *q = (Queue *)malloc(sizeof(Queue));
-    q->front = q->rear = NULL;
-    return q;
+    this = (Queue *)malloc(sizeof(Queue));
+    if (this == NULL)
+    {
+        return false;
+    }
+    this->front = this->rear = NULL;
+    return true;
 }
 
-void append(Queue *q, void *data, size_t data_size)
+void QueueAppend(Queue *this, void *data, size_t data_size)
 {
-    Node *node = newNode(data);
+    Node *node = QueueNewNode(data);
     node->data = malloc(data_size);
     if (!node->data)
     {
@@ -63,47 +42,44 @@ void append(Queue *q, void *data, size_t data_size)
     memcpy(node->data, data, data_size);
     node->next = NULL;
 
-    if (q->rear == NULL)
+    if (this->rear == NULL)
     {
-        q->front = q->rear = node;
+        this->front = this->rear = node;
     }
     else
     {
-        q->rear->next = node;
-        q->rear = node;
+        this->rear->next = node;
+        this->rear = node;
     }
 }
 
-
-void *pop(Queue *q)
+void *QueuePop(Queue *this)
 {
-    if (q->front == NULL)
+    if (this->front == NULL)
     {
         printf("队列为空\n");
         exit(1);
     }
-    Node *node = q->front;
-    q->front = q->front->next;
-    if (q->front == NULL)
+    Node *node = this->front;
+    this->front = this->front->next;
+    if (this->front == NULL)
     {
-        q->rear = NULL;
+        this->rear = NULL;
     }
     void *data = node->data;
     free(node);
     return data;
 }
 
-
-bool empty(Queue *q)
+bool QueueIsEmpty(Queue *this)
 {
-    return (q->front == NULL);
+    return (this->front == NULL);
 }
 
-
-size_t size(Queue *q)
+size_t QueueSize(Queue *this)
 {
     size_t count = 0;
-    Node *current = q->front;
+    Node *current = this->front;
     while (current != NULL)
     {
         count++;
@@ -112,103 +88,91 @@ size_t size(Queue *q)
     return count;
 }
 
-
-void *peek(Queue *q)
+void *QueuePeek(Queue *this)
 {
-    if (empty(q))
+    if (QueueIsEmpty(this))
     {
         printf("队列为空\n");
         exit(1);
     }
-    return q->front->data;
+    return this->front->data;
 }
 #else
-// 创建一个新的队列
-Queue* createQueue();
-// 入队操作
-void append(Queue *q, void* data, size_t data_size);
-// 出队操作
-void* pop(Queue *q);
-// 检查队列是否为空
-bool empty(Queue *q);
-// 检查队列是否已满
-bool isFull(Queue *q);
-// 获取队列长度
-size_t size(Queue *q);
-
-const Queue_Fuc_t Queue_Fuc = {
-    .createQueue = createQueue,
-    .append = append,
-    .pop = pop,
-    .empty = empty,
-    .isFull=isFull,
-    .size=size
-};
 
 // 创建一个新的队列
-Queue* createQueue() {
-    Queue *q = (Queue*)malloc(sizeof(Queue));
-    if (!q) {
+bool QueueCreate(Queue *this)
+{
+    this = (Queue *)malloc(sizeof(Queue));
+    if (!this)
+    {
         perror("内存分配失败");
-        exit(EXIT_FAILURE);
+        return false;
     }
-    q->front = q->rear = 0; 
-    q->size = 0;
-    return q;
+    this->front = this->rear = 0;
+    this->size = 0;
+    return true;
 }
 
 // 入队操作
-void append(Queue *q, void* data, size_t data_size) {
-    if (isFull(q)) {
+void QueueAppend(Queue *this, void *data, size_t data_size)
+{
+    if (QueueIsFull(this))
+    {
         printf("队列已满！\n");
         return;
     }
 
     // 分配内存空间
-    q->data[q->rear] = malloc(data_size);
-    if (!q->data[q->rear]) {
+    this->data[this->rear] = malloc(data_size);
+    if (!this->data[this->rear])
+    {
         perror("内存分配失败");
         exit(EXIT_FAILURE);
     }
 
     // 复制数据
-    memcpy(q->data[q->rear], data, data_size);
+    memcpy(this->data[this->rear], data, data_size);
 
     // 更新队尾指针
-    q->rear = (q->rear + 1) % MAX_QUEUE_SIZE; // 循环使用数组空间
-    q->size++; 
+    this->rear = (this->rear + 1) % MAX_QUEUE_SIZE; // 循环使用数组空间
+    this->size++;
 }
 
 // 出队操作
-void* pop(Queue *q) {
-    if (empty(q)) {
+void *QueuePop(Queue *this)
+{
+    if (QueueIsEmpty(this))
+    {
         printf("队列为空！\n");
         return NULL;
     }
 
-    void* data = q->data[q->front];
-    q->data[q->front] = NULL; // 释放原数据指针
+    void *data = this->data[this->front];
+    this->data[this->front] = NULL; // 释放原数据指针
 
     // 更新队头指针
-    q->front = (q->front + 1) % MAX_QUEUE_SIZE; // 循环使用数组空间
-    q->size--;
+    this->front = (this->front + 1) % MAX_QUEUE_SIZE; // 循环使用数组空间
+    this->size--;
 
     return data;
 }
 
 // 检查队列是否为空
-bool empty(Queue *q) {
-    return (q->size == 0);
+bool QueueIsEmpty(Queue *this)
+{
+    return (this->size == 0);
 }
 
 // 检查队列是否已满
-bool isFull(Queue *q) {
-    return (q->size == MAX_QUEUE_SIZE);
+bool QueueIsFull(Queue *this)
+{
+    return (this->size == MAX_QUEUE_SIZE);
 }
 
 // 获取队列长度
-size_t size(Queue *q) {
-    return q->size;
+size_t QueueSize(Queue *this)
+{
+    return this->size;
 }
 
 #endif

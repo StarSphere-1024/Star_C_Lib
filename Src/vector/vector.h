@@ -11,15 +11,15 @@ typedef struct Vector
     void *data;
 } Vector;
 
-void VectorCreate(Vector *this, size_t size, size_t valueSize);
+bool VectorCreate(Vector *this, size_t size, size_t valueSize);
 
-void VectorResize(Vector *this, size_t newSize);
+bool VectorResize(Vector *this, size_t newSize);
 
-void VectorSetValue(Vector *this, size_t index, void *value);
+bool VectorSetValue(Vector *this, size_t index, void *value);
 
 void *VectorGetValue(Vector *this, size_t index);
 
-void VectorPushBack(Vector *this, void *value);
+bool VectorPushBack(Vector *this, void *value);
 
 void VectorDelete(Vector *this);
 

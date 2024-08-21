@@ -4,7 +4,7 @@
 #include <string.h>
 
 // 创建一个 Vector 并分配内存
-void VectorCreate(Vector *this, size_t size, size_t valueSize)
+bool VectorCreate(Vector *this, size_t size, size_t valueSize)
 {
     this->size = size;
     this->valueSize = valueSize;
@@ -12,37 +12,41 @@ void VectorCreate(Vector *this, size_t size, size_t valueSize)
     if (this->data == NULL)
     {
         fprintf(stderr, "Memory allocation failed for vector data.\n");
-        exit(EXIT_FAILURE);
+        return false;
     }
     memset(this->data, 0, valueSize * size);
     this->len = 0;
+    return true;
 }
 
 // 重新设置Vector大小并分配内存
-void VectorResize(Vector *this, size_t newSize)
+bool VectorResize(Vector *this, size_t newSize)
 {
     void *newData = realloc(this->data, newSize * this->valueSize);
     if (newData == NULL)
     {
         fprintf(stderr, "Memory reallocation failed.\n");
-        exit(EXIT_FAILURE);
+        return false;
     }
     this->data = newData;
     this->size = newSize;
+    return true;
 }
 
 // 设置 Vector 中指定索引处的值
-void VectorSetValue(Vector *this, size_t index, void *value)
+bool VectorSetValue(Vector *this, size_t index, void *value)
 {
     if (index > this->size)
     {
-        return;
+        fprintf(stderr, "Error: Index out of bounds in VectorSetValue.\n");
+        return false;
     }
     if (index > this->len - 1)
     {
         this->len = index + 1;
     }
     memcpy(this->data + (index * this->valueSize), value, this->valueSize);
+    return true;
 }
 
 // 获取 Vector 中指定索引处的值
@@ -50,20 +54,28 @@ void *VectorGetValue(Vector *this, size_t index)
 {
     if (index > this->len - 1 || this->data == NULL)
     {
+        fprintf(stderr, "Error: Index out of bounds in VectorGetValue.\n");
         return NULL;
     }
     return this->data + (index * this->valueSize);
 }
 
 // 在 Vector 的末尾添加一个值
-void VectorPushBack(Vector *this, void *value)
+bool VectorPushBack(Vector *this, void *value)
 {
     if (this->len == this->size)
     {
-        return;
+        // 自动扩容
+        size_t newSize = this->size * 2; // 扩大两倍
+        if (!VectorResize(this, newSize))
+        {
+            // 如果扩容失败，返回 false
+            return false;
+        }
     }
     memcpy(this->data + (this->len * this->valueSize), value, this->valueSize);
     this->len++;
+    return true;
 }
 
 // 删除 Vector 并释放内存
