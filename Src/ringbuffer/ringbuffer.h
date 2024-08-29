@@ -14,28 +14,16 @@ typedef struct RingBuffer_t
     size_t head;
     size_t tail;
     size_t count;
+    bool (*is_full)(RingBuffer *self);
+    bool (*is_empty)(RingBuffer *self);
+    size_t (*size)(RingBuffer *self);
+    size_t (*write)(RingBuffer *self, uint8_t *data, size_t len);
+    size_t (*read)(RingBuffer *self, uint8_t *data, size_t len);
+    void (*clear)(RingBuffer *self);
 } RingBuffer;
 
-typedef struct RingBuffer_fuc_t
-{
-    void (*init)(RingBuffer *rbuf, size_t capacity);
-    bool (*is_full)(const RingBuffer *rbuf);
-    bool (*is_empty)(const RingBuffer *rbuf);
-    size_t (*size)(const RingBuffer *rbuf);
-    size_t (*write)(RingBuffer *rbuf, uint8_t *data, size_t len);
-    size_t (*read)(RingBuffer *rbuf, uint8_t *data, size_t len);
-    void (*free)(RingBuffer *rbuf);
-} RingBuffer_fuc_t;
+RingBuffer RingBuffer_Create(size_t capacity);
+RingBuffer* newRingBuffer(size_t capacity);
+void freeRingBuffer(RingBuffer* self);
 
-extern const RingBuffer_fuc_t rbuf_fuc;
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-#ifdef __cplusplus
-}
-
-#endif
-
-#endif /* __RINGBUF_H_ */
+#endif 
