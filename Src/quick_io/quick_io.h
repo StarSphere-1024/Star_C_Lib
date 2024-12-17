@@ -4,13 +4,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-bool getint(int *x);
+bool QIOGetInt(int *x);
 
-void getdouble(double *x);
+void QIOGetDouble(double *x);
 
-void putint(int x);
+void QIOPutInt(int x);
 
-void putdouble(int precision, double x);
+void QIOPutDouble(int precision, double x);
 
 #endif
 
